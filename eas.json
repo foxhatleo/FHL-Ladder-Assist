@@ -1,0 +1,23 @@
+{
+  "cli": {
+    "version": ">= 5.9.0"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "channel": "development"
+    },
+    "preview": {
+      "distribution": "internal",
+      "channel": "preview"
+    },
+    "production": {
+      "distribution": "internal",
+      "channel": "production"
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

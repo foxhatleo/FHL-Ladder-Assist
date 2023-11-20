@@ -1,12 +1,17 @@
 {
   "expo": {
-    "name": "ladder-assist",
+    "name": "梯子辅助",
     "slug": "ladder-assist",
+    "owner": "leoliang",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
+    "platforms": [
+      "android",
+      "web"
+    ],
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
@@ -15,25 +20,29 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "ios": {
-      "supportsTablet": true
-    },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+      "package": "com.leoliang.android.LadderAssist"
     },
     "web": {
       "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "output": "static"
     },
-    "plugins": [
-      "expo-router"
-    ],
-    "experiments": {
-      "typedRoutes": true
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "716da8b1-632f-41c5-ba21-6115bae1c1e4"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/716da8b1-632f-41c5-ba21-6115bae1c1e4"
+    },
+    "ios": {
+      "bundleIdentifier": "com.leoliang.android.LadderAssist"
     }
   }
 }
