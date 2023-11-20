@@ -76,7 +76,7 @@ const App: React.ComponentType<{ theme: MD3Theme }> = ({ theme: { colors } }) =>
 
     const refresh = async () => {
         setError("");
-        const appsRes = await fetch("https://ladder-assist.leoliang.com");
+        const appsRes = await fetch("https://ladder-assist.leoliang.com/api");
         const apps = await appsRes.json();
         if (apps.version !== 1) {
             setError(`后端版本号不支持：${apps.version}`);
