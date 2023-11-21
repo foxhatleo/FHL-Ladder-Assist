@@ -9,10 +9,8 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.module.annotations.ReactModule;
 
 import android.content.pm.PackageInfo;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-
-import java.util.List;
+import android.os.Build;
 
 @ReactModule(name = LadderAssistAppListModule.NAME)
 public class LadderAssistAppListModule extends ReactContextBaseJavaModule {
@@ -40,6 +38,15 @@ public class LadderAssistAppListModule extends ReactContextBaseJavaModule {
         } catch (PackageManager.NameNotFoundException e) {
             promise.resolve(-1);
         }
+    }
 
+    @ReactMethod
+    public void getArch(Promise promise) {
+        StringBuilder res = new StringBuilder();
+        for (String abi : Build.SUPPORTED_ABIS) {
+            res.append(abi);
+            res.append("|");
+        }
+        promise.resolve(res.toString());
     }
 }

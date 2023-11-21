@@ -23,6 +23,7 @@ public class LadderAssistPackage implements ReactPackage {
         //this is where you register the module
         modules.add(new LadderAssistAppListModule(reactContext));
         modules.add(new LadderAssistApkInstallerModule(reactContext));
+        modules.add(new LadderAssistSystemModule(reactContext));
         return modules;
     }
 }
