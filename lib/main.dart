@@ -28,24 +28,28 @@ class MyApp extends StatelessWidget {
 }
 
 Future<List<AppEntry>> _loadAppEntries() async {
-  final response =
-      await http.get(Uri.parse('https://fhlclimb.work/data.json'));
-  if (response.statusCode == 200) {
-    dynamic data = jsonDecode(response.body);
-    if (data is List) {
-      return data.map((dynamic item) {
-        String friendlyName = item['friendlyName'] ?? '';
-        String packageName = item['packageName'] ?? '';
-        int latestVersionCode = item['latestVersionCode'] ?? 0;
-        String updatePath = item['updatePath'] ?? '';
-        return AppEntry(
-            friendlyName, packageName, latestVersionCode, updatePath);
-      }).toList();
+  try {
+    final response =
+        await http.get(Uri.parse('https://fhlclimb.work/data.json'));
+    if (response.statusCode == 200) {
+      dynamic data = jsonDecode(response.body);
+      if (data is List) {
+        return data.map((dynamic item) {
+          String friendlyName = item['friendlyName'] ?? '';
+          String packageName = item['packageName'] ?? '';
+          int latestVersionCode = item['latestVersionCode'] ?? 0;
+          String updatePath = item['updatePath'] ?? '';
+          return AppEntry(
+              friendlyName, packageName, latestVersionCode, updatePath);
+        }).toList();
+      } else {
+        return [];
+      }
     } else {
       return [];
     }
-  } else {
-    throw Exception('Failed to load app entries.');
+  } catch (e) {
+    return [];
   }
 }
 
@@ -78,9 +82,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 content = entries.map((e) => AppButton(appEntry: e)).toList();
               }
               List<Widget> finalContent = [];
-              finalContent.add(const SizedBox(
-                height: 25,
-              ));
               for (int i = 0; i < content.length; i++) {
                 finalContent.add(content[i]);
                 if (i < content.length - 1) {
@@ -89,11 +90,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   ));
                 }
               }
-              finalContent.add(const SizedBox(
-                height: 25,
-              ));
               return Center(
                   child: SingleChildScrollView(
+                      padding: EdgeInsets.all(16.0),
                       child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: finalContent)));

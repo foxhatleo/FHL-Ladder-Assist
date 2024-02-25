@@ -92,17 +92,15 @@ class _AppButtonState extends State<AppButton> {
     );
     try {
       await Dio().download(
-          "https://fhlclimb.work/apk/${widget.appEntry.updatePath}",
-          savePath,
-          cancelToken: cancelToken,
-          onReceiveProgress: (count, total) {
-            final value = count / total;
-            if (setDialogState != null) {
-              setDialogState!(() {
-                progress = value;
-              });
-            }
+          "https://fhlclimb.work/apk/${widget.appEntry.updatePath}", savePath,
+          cancelToken: cancelToken, onReceiveProgress: (count, total) {
+        final value = count / total;
+        if (setDialogState != null) {
+          setDialogState!(() {
+            progress = value;
           });
+        }
+      });
     } catch (e) {
       if (!mounted) return;
       Navigator.of(context).pop();
@@ -137,13 +135,11 @@ class _AppButtonState extends State<AppButton> {
         child: _state == AppState.installed
             ? FilledButton.tonal(
                 onPressed: _install,
-                child: Text(
-                    "${widget.appEntry.friendlyName} 已是最新版"),
+                child: Text("${widget.appEntry.friendlyName} 已是最新版"),
               )
             : FilledButton(
                 onPressed: _install,
-                child: Text(
-                    "${widget.appEntry.friendlyName} 有更新"),
+                child: Text("${widget.appEntry.friendlyName} 有更新"),
               ),
       ),
     );

@@ -1,5 +1,3 @@
-
-
 class AppEntry {
   final String packageName;
   final String friendlyName;
