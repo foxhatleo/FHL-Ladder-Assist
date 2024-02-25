@@ -27,32 +27,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-Future<List<AppEntry>> _loadAppEntries() async {
-  try {
-    final response =
-        await http.get(Uri.parse('https://fhlclimb.work/data.json'));
-    if (response.statusCode == 200) {
-      dynamic data = jsonDecode(response.body);
-      if (data is List) {
-        return data.map((dynamic item) {
-          String friendlyName = item['friendlyName'] ?? '';
-          String packageName = item['packageName'] ?? '';
-          int latestVersionCode = item['latestVersionCode'] ?? 0;
-          String updatePath = item['updatePath'] ?? '';
-          return AppEntry(
-              friendlyName, packageName, latestVersionCode, updatePath);
-        }).toList();
-      } else {
-        return [];
-      }
-    } else {
-      return [];
-    }
-  } catch (e) {
-    return [];
-  }
-}
-
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
@@ -61,6 +35,50 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Future<List<AppEntry>> _loadAppEntries() async {
+    try {
+      final response =
+          await http.get(Uri.parse('https://fhlclimb.work/data.json'));
+      if (response.statusCode == 200) {
+        dynamic data = jsonDecode(response.body);
+        if (data is List) {
+          return data.map((dynamic item) {
+            String friendlyName = item['friendlyName'] ?? '';
+            String packageName = item['packageName'] ?? '';
+            int latestVersionCode = item['latestVersionCode'] ?? 0;
+            String updatePath = item['updatePath'] ?? '';
+            return AppEntry(
+                friendlyName, packageName, latestVersionCode, updatePath);
+          }).toList();
+        } else {
+          return [];
+        }
+      } else {
+        return [];
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text('出错了'),
+            content: Text(e.toString()),
+            actions: [
+              TextButton(
+                child: const Text('关闭'),
+                onPressed: () {
+                  if (!mounted) return;
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      }
+      return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
