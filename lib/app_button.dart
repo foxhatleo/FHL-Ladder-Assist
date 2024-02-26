@@ -1,13 +1,13 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:math';
 
+import 'package:app_installer/app_installer.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:install_plugin/install_plugin.dart';
 import 'package:installed_apps/installed_apps.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'app_entry.dart';
+import 'main.dart';
 
 class AppButton extends StatefulWidget {
   final AppEntry appEntry;
@@ -59,24 +59,20 @@ class _AppButtonState extends State<AppButton> {
     }
   }
 
-  Future<File> _copyFileToExternalStorage(File sourceFile) async {
-    Directory? externalDir = await getExternalStorageDirectory();
-    if (externalDir == null) {
-      throw Exception("External storage directory not found");
-    }
-    File destinationFile = File('${externalDir.path}/ladder-assist-cache.apk');
-    await sourceFile.copy(destinationFile.path);
-    await sourceFile.delete();
-    return destinationFile;;
-  }
+  // Future<File> _copyFileToExternalStorage(File sourceFile) async {
+  //   Directory? externalDir = await getExternalStorageDirectory();
+  //   if (externalDir == null) {
+  //     throw Exception("External storage directory not found");
+  //   }
+  //   File destinationFile = File('${externalDir.path}/ladder-assist-cache.apk');
+  //   await sourceFile.copy(destinationFile.path);
+  //   await sourceFile.delete();
+  //   return destinationFile;;
+  // }
 
   void _install() async {
-    var appDocDir = await getExternalStorageDirectory();
-    if (appDocDir == null) {
-      throw Exception('Could not get external directory.');
-    }
-    String savePath =
-        "${appDocDir.path}/${widget.appEntry.friendlyName}_${widget.appEntry.latestVersion}.apk";
+    await deleteApkFiles();
+    var path = await apkCachePath();
     if (!mounted) return;
     StateSetter? setDialogState;
     double progress = 0.0;
@@ -105,8 +101,10 @@ class _AppButtonState extends State<AppButton> {
       barrierDismissible: false,
     );
     try {
+      var r = Random();
       await Dio().download(
-          "https://fhlclimb.work/apk/${widget.appEntry.updatePath}", savePath,
+          "https://fhlclimb.work/apk/${widget.appEntry.updatePath}?${r.nextInt(1000000)}",
+          path,
           cancelToken: cancelToken, onReceiveProgress: (count, total) {
         final value = count / total;
         if (setDialogState != null) {
@@ -127,11 +125,8 @@ class _AppButtonState extends State<AppButton> {
     }
     if (!mounted) return;
     Navigator.of(context).pop();
-    await InstallPlugin.install(savePath);
+    await AppInstaller.installApk(path);
     _refreshState();
-    try {
-      File(savePath).delete();
-    } catch (e) {}
   }
 
   @override

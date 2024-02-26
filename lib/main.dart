@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
+import 'package:external_path/external_path.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:ladder_assist/app_button.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'app_entry.dart';
@@ -37,19 +38,19 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+Future<String> apkCachePath() async {
+  var sdRoot = (await ExternalPath.getExternalStorageDirectories())[0];
+  var path = '$sdRoot/ladder-assist';
+  var pathDir = Directory(path);
+  try {
+    await pathDir.create(recursive: true);
+  } catch (e) {}
+  return '$path/cache.apk';
+}
+
 Future<void> deleteApkFiles() async {
   try {
-    var externalDirectory = await getExternalStorageDirectory();
-    if (externalDirectory == null) {
-      throw Exception('Could not get external directory.');
-    }
-    List<FileSystemEntity> files = externalDirectory.listSync();
-    for (FileSystemEntity file in files) {
-      if (file is File && file.path.endsWith('.apk')) {
-        await file.delete();
-        print('Deleted APK file: ${file.path}');
-      }
-    }
+    await File(await apkCachePath()).delete();
   } catch (e) {}
 }
 
@@ -59,13 +60,14 @@ Future<void> requestPermission(Permission permission) async {
 
 class _MyHomePageState extends State<MyHomePage> {
   Future<List<AppEntry>> _loadAppEntries() async {
-    await requestPermission(Permission.storage);
-    await requestPermission(Permission.manageExternalStorage);
-    await requestPermission(Permission.requestInstallPackages);
+    await Permission.storage.request();
+    await Permission.manageExternalStorage.request();
+    await Permission.requestInstallPackages.request();
     await deleteApkFiles();
     try {
-      final response =
-          await http.get(Uri.parse('https://fhlclimb.work/data.json'));
+      var r = Random();
+      final response = await http.get(
+          Uri.parse('https://fhlclimb.work/data.json?${r.nextInt(1000000)}'));
       if (response.statusCode == 200) {
         dynamic data = jsonDecode(response.body);
         if (data is List) {

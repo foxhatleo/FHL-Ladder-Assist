@@ -55,7 +55,7 @@
                 android:value="2"/>
         <provider
                 android:name="androidx.core.content.FileProvider"
-                android:authorities="${applicationName}.fileprovider"
+                android:authorities="com.leoliang.ladder_assist.fileProvider"
                 android:grantUriPermissions="true"
                 android:exported="false">
             <meta-data

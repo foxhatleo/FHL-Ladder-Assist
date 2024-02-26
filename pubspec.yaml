@@ -37,10 +37,10 @@ dependencies:
   cupertino_icons: ^1.0.6
   installed_apps: ^1.4.0
   http: ^1.2.1
-  install_plugin: ^2.1.0
   dio: ^5.4.1
-  path_provider: ^2.1.2
   permission_handler: ^11.3.0
+  external_path: ^1.0.3
+  app_installer: ^1.1.0
 
 dev_dependencies:
   flutter_test:
