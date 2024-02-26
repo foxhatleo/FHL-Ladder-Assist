@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:ladder_assist/app_button.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'app_entry.dart';
 
@@ -34,8 +37,32 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+Future<void> deleteApkFiles() async {
+  try {
+    var externalDirectory = await getExternalStorageDirectory();
+    if (externalDirectory == null) {
+      throw Exception('Could not get external directory.');
+    }
+    List<FileSystemEntity> files = externalDirectory.listSync();
+    for (FileSystemEntity file in files) {
+      if (file is File && file.path.endsWith('.apk')) {
+        await file.delete();
+        print('Deleted APK file: ${file.path}');
+      }
+    }
+  } catch (e) {}
+}
+
+Future<void> requestPermission(Permission permission) async {
+  await permission.request();
+}
+
 class _MyHomePageState extends State<MyHomePage> {
   Future<List<AppEntry>> _loadAppEntries() async {
+    await requestPermission(Permission.storage);
+    await requestPermission(Permission.manageExternalStorage);
+    await requestPermission(Permission.requestInstallPackages);
+    await deleteApkFiles();
     try {
       final response =
           await http.get(Uri.parse('https://fhlclimb.work/data.json'));
@@ -45,10 +72,10 @@ class _MyHomePageState extends State<MyHomePage> {
           return data.map((dynamic item) {
             String friendlyName = item['friendlyName'] ?? '';
             String packageName = item['packageName'] ?? '';
-            int latestVersionCode = item['latestVersionCode'] ?? 0;
+            int latestVersion = item['latestVersion'] ?? 0;
             String updatePath = item['updatePath'] ?? '';
             return AppEntry(
-                friendlyName, packageName, latestVersionCode, updatePath);
+                friendlyName, packageName, latestVersion, updatePath);
           }).toList();
         } else {
           return [];

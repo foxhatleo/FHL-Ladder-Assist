@@ -44,7 +44,7 @@ class _AppButtonState extends State<AppButton> {
     int version = -1;
     try {
       var info = await InstalledApps.getAppInfo(widget.appEntry.packageName);
-      if (info.versionCode! < widget.appEntry.latestVersionCode) {
+      if (info.versionCode! < widget.appEntry.latestVersion) {
         newState = AppState.updateAvailable;
       } else {
         newState = AppState.installed;
@@ -59,10 +59,24 @@ class _AppButtonState extends State<AppButton> {
     }
   }
 
+  Future<File> _copyFileToExternalStorage(File sourceFile) async {
+    Directory? externalDir = await getExternalStorageDirectory();
+    if (externalDir == null) {
+      throw Exception("External storage directory not found");
+    }
+    File destinationFile = File('${externalDir.path}/ladder-assist-cache.apk');
+    await sourceFile.copy(destinationFile.path);
+    await sourceFile.delete();
+    return destinationFile;;
+  }
+
   void _install() async {
-    var appDocDir = await getTemporaryDirectory();
+    var appDocDir = await getExternalStorageDirectory();
+    if (appDocDir == null) {
+      throw Exception('Could not get external directory.');
+    }
     String savePath =
-        "${appDocDir.path}/${widget.appEntry.friendlyName}_${widget.appEntry.latestVersionCode}.apk";
+        "${appDocDir.path}/${widget.appEntry.friendlyName}_${widget.appEntry.latestVersion}.apk";
     if (!mounted) return;
     StateSetter? setDialogState;
     double progress = 0.0;
@@ -114,13 +128,10 @@ class _AppButtonState extends State<AppButton> {
     if (!mounted) return;
     Navigator.of(context).pop();
     await InstallPlugin.install(savePath);
-    try {
-      File file = File(savePath);
-      if (await file.exists()) {
-        await file.delete();
-      }
-    } catch (e) {}
     _refreshState();
+    try {
+      File(savePath).delete();
+    } catch (e) {}
   }
 
   @override

@@ -1,13 +1,13 @@
 class AppEntry {
   final String packageName;
   final String friendlyName;
-  final int latestVersionCode;
+  final int latestVersion;
   final String updatePath;
 
   AppEntry(
     this.friendlyName,
     this.packageName,
-    this.latestVersionCode,
+    this.latestVersion,
     this.updatePath,
   );
 }
